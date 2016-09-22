@@ -36,6 +36,7 @@ public class BodyDataSender : Singleton<BodyDataSender> {
         // Send over the bodyData one tracked body at a time
         List<ulong> trackingIDs = new List<ulong>(bodyData.Keys);
         foreach (ulong trackingID in trackingIDs) {
+            Debug.Log("tracking ID:" + trackingID);
             CustomMessages2.Instance.SendBodyData(trackingID, bodyData[trackingID]);
         }
     }
