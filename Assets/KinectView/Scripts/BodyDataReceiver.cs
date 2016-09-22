@@ -31,6 +31,7 @@ public class BodyDataReceiver : Singleton<BodyDataReceiver>
     void UpdateBodyData(NetworkInMessage msg)
     {
         // Parse the message
+        Debug.Log("Got vectors message");
         ulong trackingID = (ulong)msg.ReadInt64();
         Vector3 jointPos;
         Vector3[] jointPositions = new Vector3[25];

@@ -197,7 +197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BoneMaterial: {fileID: 2100000, guid: f2ea145c63353784985576f08398a815, type: 2}
-  BodySourceManager: {fileID: 0}
+  BodySourceManager: {fileID: 1694865363}
 --- !u!4 &576739139
 Transform:
   m_ObjectHideFlags: 0
