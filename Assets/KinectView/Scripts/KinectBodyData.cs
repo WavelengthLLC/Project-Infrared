@@ -1,9 +1,3 @@
-/*
- * KinectBodyData.cs
- *
- * Retrieves Kinect skeletal data
- */
-
 using UnityEngine;
 using System.Collections;
 using Windows.Kinect;
@@ -14,33 +8,35 @@ public class KinectBodyData : MonoBehaviour {
     private BodyFrameReader _Reader;
     private Body[] _Bodies = null;
     
-    // Public function so other scripts can grab the Kinect Data
-    public Body[] GetData() {
+    public Body[] GetData()
+    {
         return _Bodies;
     }
     
-    // Open connections to the Kinect
-    void Start () {
+    void Start ()
+    {
         _Sensor = KinectSensor.GetDefault();
 
-        if (_Sensor != null) {
+        if (_Sensor != null)
+        {
             _Reader = _Sensor.BodyFrameSource.OpenReader();
             
-            if (!_Sensor.IsOpen) {
+            if (!_Sensor.IsOpen)
+            {
                 _Sensor.Open();
             }
         }   
     }
     
-    // Update Kinect body data on every frame
-    void Update () {
-
-        if (_Reader != null) {
+    void Update ()
+    {
+        if (_Reader != null)
+        {
             var frame = _Reader.AcquireLatestFrame();
-
-            if (frame != null) {
-
-                if (_Bodies == null) {
+            if (frame != null)
+            {
+                if (_Bodies == null)
+                {
                     _Bodies = new Body[_Sensor.BodyFrameSource.BodyCount];
                 }
                 
@@ -52,17 +48,18 @@ public class KinectBodyData : MonoBehaviour {
         }    
     }
     
-    // Close connections to the Kinect
-    void OnApplicationQuit() {
-
-        if (_Reader != null) {
+    void OnApplicationQuit()
+    {
+        if (_Reader != null)
+        {
             _Reader.Dispose();
             _Reader = null;
         }
         
-        if (_Sensor != null) {
-
-            if (_Sensor.IsOpen) {
+        if (_Sensor != null)
+        {
+            if (_Sensor.IsOpen)
+            {
                 _Sensor.Close();
             }
             
