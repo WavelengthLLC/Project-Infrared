@@ -134,10 +134,12 @@ public class BodyView : MonoBehaviour
             _BodyDataReceiver = BodySourceManager.GetComponent<BodyDataReceiver>();
             if (_BodyDataReceiver == null)
             {
+                Debug.Log("No body data receiver");
                 return;
             }
             else
             {
+                Debug.Log("Getting bodies position orientation data");
                 bodies_pos = _BodyDataReceiver.GetPosData();
                 bodies_rot = _BodyDataReceiver.GetRotData();
             }
@@ -149,6 +151,7 @@ public class BodyView : MonoBehaviour
 
         if (bodies_pos == null || bodies_rot == null)
         {
+            Debug.Log("No bodies position orientation data");
             return;
         }
 
@@ -166,9 +169,10 @@ public class BodyView : MonoBehaviour
 
         foreach (ulong trackingID in bodies_pos.Keys)
         {
-
+            Debug.Log("Checking bodies with tracking ID:" + trackingID);
             if (!_Bodies.ContainsKey(trackingID))
             {
+                Debug.Log("Create Body Object");
                 _Bodies[trackingID] = CreateBodyObject(trackingID);
             }
 
@@ -186,7 +190,7 @@ public class BodyView : MonoBehaviour
         return body;
     }
 
-    private void SetAvatarScale(GameObject bodyObject)
+/*    private void SetAvatarScale(GameObject bodyObject)
     {
 
         Transform avatar = bodyObject.transform.FindChild("Avatar");
@@ -205,7 +209,7 @@ public class BodyView : MonoBehaviour
         float scaleFactor = bodyScale / avatarScale;
         avatar.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 
-    }
+    }*/
 
     private void RefreshBodyObject(ulong id, Dictionary<ulong, Vector3[]> bodies_pos, Dictionary<ulong, Quaternion[]> bodies_rot)
     {
