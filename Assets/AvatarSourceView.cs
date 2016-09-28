@@ -11,6 +11,7 @@ public class AvatarSourceView : MonoBehaviour
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
     private BodySourceManager _BodyManager;
 
+
     private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
     {
         { Kinect.JointType.FootLeft, Kinect.JointType.AnkleLeft },
@@ -113,7 +114,6 @@ public class AvatarSourceView : MonoBehaviour
       {"FootLeft", "Bip01/Bip01 Pelvis/Bip01 Spine/Bip01 R Thigh/Bip01 R Calf/Bip01 R Foot"},
   };
    */
-
     void Update()
     {
         if (BodySourceManager == null)
@@ -149,7 +149,6 @@ public class AvatarSourceView : MonoBehaviour
 
         List<ulong> knownIds = new List<ulong>(_Bodies.Keys);
 
-        // First delete untracked bodies
         foreach (ulong trackingId in knownIds)
         {
             if (!trackedIds.Contains(trackingId))

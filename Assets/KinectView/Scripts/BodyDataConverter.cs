@@ -16,12 +16,12 @@ public class BodyDataConverter : MonoBehaviour {
     public GameObject KinectBodyData;
     
     // Dictionary that maps body trackingIDs to an array of joint locations
-    private Dictionary<ulong, Vector3[]> _Bodies =
-        new Dictionary<ulong, Vector3[]>();
+    private Dictionary<ulong, Transform[]> _Bodies =
+        new Dictionary<ulong, Transform[]>();
     private KinectBodyData _BodyManager;
 
     // Public function so other scripts can send out the data
-    public Dictionary<ulong, Vector3[]> GetData() {
+    public Dictionary<ulong, Transform[]> GetData() {
         return _Bodies;
     }
     
@@ -82,20 +82,28 @@ public class BodyDataConverter : MonoBehaviour {
         }
     }
     
-    private Vector3[] CreateBodyData() {
-        Vector3[] body = new Vector3[25];
+    private Transform[] CreateBodyData() {
+        Transform[] body = new Transform[25];
         return body;
     }
     
-    private void UpdateBodyData(Kinect.Body body, Vector3[] bodyData) {
+    private void UpdateBodyData(Kinect.Body body, Transform[] bodyData) {
 
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++) {
             Kinect.Joint sourceJoint = body.Joints[jt];
-            bodyData[(int)jt] = GetVector3FromJoint(sourceJoint);
+            Kinect.JointOrientation sourceJointOrientation = body.JointOrientations[jt];
+            bodyData[(int)jt].position = GetVector3FromJoint(sourceJoint);
+            bodyData[(int)jt].rotation = GetQuaternionFromJointOrientation(sourceJointOrientation);
         }
     }
 
-    private static Vector3 GetVector3FromJoint(Kinect.Joint joint) {
-        return new Vector3(joint.Position.X * 10, joint.Position.Y * 10, joint.Position.Z * 10);
+    private static Vector3 GetVector3FromJoint(Kinect.Joint joint)
+    {
+        return new Vector3(joint.Position.X, joint.Position.Y, joint.Position.Z);
+    }
+
+    private static Quaternion GetQuaternionFromJointOrientation(Kinect.JointOrientation jointOrientation)
+    {
+        return new Quaternion(jointOrientation.Orientation.X, jointOrientation.Orientation.Y, jointOrientation.Orientation.Z, jointOrientation.Orientation.W);
     }
 }

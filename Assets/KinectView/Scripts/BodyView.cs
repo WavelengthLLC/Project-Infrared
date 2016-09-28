@@ -1,111 +1,249 @@
-/*
- * BodyView.cs
- *
- * Displays spheres for Kinect body joints
- * Requires the BodyDataConverter script or the BodyDataReceiver script
- */
-
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Kinect = Windows.Kinect;
 
-public class BodyView : MonoBehaviour {
-
+public class BodyView : MonoBehaviour
+{
     public Material BoneMaterial;
     public GameObject BodySourceManager;
 
-    // Dictionary relating tracking IDs to displayed GameObjects
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
     private BodyDataConverter _BodyDataConverter;
     private BodyDataReceiver _BodyDataReceiver;
 
-    void Update() {
+    private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
+    {
+        { Kinect.JointType.FootLeft, Kinect.JointType.AnkleLeft },
+        { Kinect.JointType.AnkleLeft, Kinect.JointType.KneeLeft },
+        { Kinect.JointType.KneeLeft, Kinect.JointType.HipLeft },
+        { Kinect.JointType.HipLeft, Kinect.JointType.SpineBase },
 
-        if (BodySourceManager == null) {
+        { Kinect.JointType.FootRight, Kinect.JointType.AnkleRight },
+        { Kinect.JointType.AnkleRight, Kinect.JointType.KneeRight },
+        { Kinect.JointType.KneeRight, Kinect.JointType.HipRight },
+        { Kinect.JointType.HipRight, Kinect.JointType.SpineBase },
+
+        { Kinect.JointType.HandTipLeft, Kinect.JointType.HandLeft },
+        { Kinect.JointType.ThumbLeft, Kinect.JointType.HandLeft },
+        { Kinect.JointType.HandLeft, Kinect.JointType.WristLeft },
+        { Kinect.JointType.WristLeft, Kinect.JointType.ElbowLeft },
+        { Kinect.JointType.ElbowLeft, Kinect.JointType.ShoulderLeft },
+        { Kinect.JointType.ShoulderLeft, Kinect.JointType.SpineShoulder },
+
+        { Kinect.JointType.HandTipRight, Kinect.JointType.HandRight },
+        { Kinect.JointType.ThumbRight, Kinect.JointType.HandRight },
+        { Kinect.JointType.HandRight, Kinect.JointType.WristRight },
+        { Kinect.JointType.WristRight, Kinect.JointType.ElbowRight },
+        { Kinect.JointType.ElbowRight, Kinect.JointType.ShoulderRight },
+        { Kinect.JointType.ShoulderRight, Kinect.JointType.SpineShoulder },
+
+        { Kinect.JointType.SpineBase, Kinect.JointType.SpineMid },
+        { Kinect.JointType.SpineMid, Kinect.JointType.SpineShoulder },
+        { Kinect.JointType.SpineShoulder, Kinect.JointType.Neck },
+        { Kinect.JointType.Neck, Kinect.JointType.Head },
+    };
+
+
+    // Jill Zombie Avatar from Mixamo
+
+    private Dictionary<string, string> _RigMap = new Dictionary<string, string>()
+    {
+        {"SpineBase", "Hips"},
+        {"KneeLeft", "Hips/RightUpLeg"},
+        {"KneeRight", "Hips/LeftUpLeg"},
+        {"AnkleLeft", "Hips/RightUpLeg/RightLeg"},
+        {"AnkleRight", "Hips/LeftUpLeg/LeftLeg"},
+        //{"FootLeft", "Hips/RightUpLeg/RightLeg/RightFoot"},
+        //{"FootRight", "Hips/LeftUpLeg/LeftLeg/LeftFoot"},
+
+        {"SpineMid", "Hips/Spine"},
+        {"SpineShoulder", "Hips/Spine/Spine1/Spine2"},
+        {"ShoulderLeft", "Hips/Spine/Spine1/Spine2/RightShoulder"},
+        {"ShoulderRight", "Hips/Spine/Spine1/Spine2/LeftShoulder"},
+        {"ElbowLeft", "Hips/Spine/Spine1/Spine2/RightShoulder/RightArm"},
+        {"ElbowRight", "Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm"},
+        {"WristLeft", "Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm"},
+        {"WristRight", "Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm"},
+
+        //{"HandLeft", "Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand"},
+        //{"HandRight", "Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand"},
+
+        {"Neck", "Hips/Spine/Spine1/Spine2/Neck"},
+        {"Head", "Hips/Spine/Spine1/Spine2/Neck/Neck1/Head"},
+
+    };
+
+    private Dictionary<string, Quaternion> _RigMapOffsets = new Dictionary<string, Quaternion>()
+    {
+        {"SpineBase", Quaternion.Euler(0.0f,0.0f, 0.0f)},
+        {"KneeLeft", Quaternion.Euler(0.0f, 90.0f, 0.0f)},
+        {"KneeRight", Quaternion.Euler(0.0f, -90.0f, 0.0f)},
+        {"AnkleLeft", Quaternion.Euler(0.0f, 90.0f, 0.0f)},
+        {"AnkleRight", Quaternion.Euler(0.0f, -90.0f, 0.0f)},
+        //{"FootLeft", Quaternion.Euler(225.0f, 0.0f, 0.0f)},
+        //{"FootRight", Quaternion.Euler(225.0f, 0.0f, 0.0f)},
+
+        {"SpineMid",Quaternion.Euler(0.0f, 0.0f, 0.0f)},
+        {"SpineShoulder",Quaternion.Euler(0.0f, 0.0f, 0.0f)},
+        {"ShoulderLeft", Quaternion.Euler(0.0f, 90.0f, 0.0f)},
+        {"ShoulderRight", Quaternion.Euler(0.0f, -90.0f, 0.0f)},
+        {"ElbowLeft", Quaternion.Euler(0.0f, 180.0f, 0.0f)},
+        {"ElbowRight", Quaternion.Euler(0f, -180.0f, 0.0f)},
+        {"WristLeft", Quaternion.Euler(0.0f, 90.0f, 0.0f)},
+        {"WristRight", Quaternion.Euler(0.0f, -90.0f, 0.0f)},
+
+        //{"HandLeft", Quaternion.Euler(0.0f, 90.0f, 0.0f)},
+        //{"HandRight", Quaternion.Euler(0.0f, 0.0f, 0.0f)},
+
+        {"Neck", Quaternion.Euler(0.0f, 0.0f, 0.0f)},
+        {"Head", Quaternion.Euler(0.0f, 0.0f, 0.0f)},
+
+    };
+
+    // Zombie Avatar
+    /*
+  private Dictionary<string, string> _RigMap = new Dictionary<string, string>()
+  {
+      {"SpineBase", "Bip01"},
+      {"KneeRight", "Bip01/Bip01 Pelvis/Bip01 Spine/Bip01 L Thigh"},
+      {"KneeLeft", "Bip01/Bip01 Pelvis/Bip01 Spine/Bip01 R Thigh"},
+      {"AnkleRight", "Bip01/Bip01 Pelvis/Bip01 Spine/Bip01 L Thigh/Bip01 L Calf"},
+      {"AnkleLeft", "Bip01/Bip01 Pelvis/Bip01 Spine/Bip01 R Thigh/Bip01 R Calf"},
+      {"FootRight", "Bip01/Bip01 Pelvis/Bip01 Spine/Bip01 L Thigh/Bip01 L Calf/Bip01 L Foot"},
+      {"FootLeft", "Bip01/Bip01 Pelvis/Bip01 Spine/Bip01 R Thigh/Bip01 R Calf/Bip01 R Foot"},
+  };
+   */
+    void Update()
+    {
+        if (BodySourceManager == null)
+        {
             return;
         }
 
-        // Dictionary of tracked bodies from the Kinect or from data
-        // sent over the server
-        Dictionary<ulong, Vector3[]> bodies;
+        Dictionary<ulong, Transform[]> bodies;
 
-        // Is the body data coming from the BodyDataConverter script?
         _BodyDataConverter = BodySourceManager.GetComponent<BodyDataConverter>();
-        if (_BodyDataConverter == null) {
-            // Is the body data coming from the BodyDataReceriver script?
+        if (_BodyDataConverter == null)
+        {
             _BodyDataReceiver = BodySourceManager.GetComponent<BodyDataReceiver>();
-            if (_BodyDataReceiver == null) {
+            if (_BodyDataReceiver == null)
+            {
                 return;
-            } else {
+            }
+            else
+            {
                 bodies = _BodyDataReceiver.GetData();
             }
-        } else {
+        }
+        else
+        {
             bodies = _BodyDataConverter.GetData();
         }
 
-        if (bodies == null) {
+        if (bodies == null)
+        {
             return;
         }
 
-        // Delete untracked bodies
         List<ulong> trackedIDs = new List<ulong>(bodies.Keys);
         List<ulong> knownIDs = new List<ulong>(_Bodies.Keys);
-        foreach (ulong trackingID in knownIDs) {
+        foreach (ulong trackingID in knownIDs)
+        {
 
-            if (!trackedIDs.Contains(trackingID)) {
+            if (!trackedIDs.Contains(trackingID))
+            {
                 Destroy(_Bodies[trackingID]);
                 _Bodies.Remove(trackingID);
             }
         }
 
-        // Add and update tracked bodies
-        foreach (ulong trackingID in bodies.Keys) {
+        foreach (ulong trackingID in bodies.Keys)
+        {
 
-            // Add tracked bodies if they are not already being displayed
-            if (!_Bodies.ContainsKey(trackingID)) {
+            if (!_Bodies.ContainsKey(trackingID))
+            {
                 _Bodies[trackingID] = CreateBodyObject(trackingID);
             }
 
-            // Update the positions of each body's joints
-            RefreshBodyObject(bodies[trackingID], _Bodies[trackingID]);
+            RefreshBodyObject( _Bodies[trackingID]);
         }
     }
 
-    // Create a GameObject given a tracking ID
-    private GameObject CreateBodyObject(ulong id) {
+    private GameObject CreateBodyObject(ulong id)
+    {
 
         GameObject body = new GameObject("Body:" + id);
 
-        for (int i = 0; i < 25; i++) {
-            GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
+        {
+            GameObject jointObj = new GameObject();
+            //GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
-            LineRenderer lr = jointObj.AddComponent<LineRenderer>();
-            lr.SetVertexCount(2);
-            lr.material = BoneMaterial;
-            lr.SetWidth(0.05f, 0.05f);
-
-            jointObj.transform.localScale = new Vector3(0.09f, 0.09f, 0.09f);
-            jointObj.name = i.ToString();
+            jointObj.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+            jointObj.name = jt.ToString();
             jointObj.transform.parent = body.transform;
         }
-
+        // Add avatar gameobject from source
+        GameObject avatar = Instantiate(Resources.Load("Jill", typeof(GameObject))) as GameObject;
+        avatar.transform.parent = body.transform;
+        avatar.name = "Avatar";
+        //avatar.transform.parent = body.transform.Find("SpineBase");
         return body;
     }
 
-    // Update the joint GameObjects of a given body
-    private void RefreshBodyObject(Vector3[] jointPositions, GameObject bodyObj) {
+    private void SetAvatarScale(GameObject bodyObject)
+    {
 
-        for (int i = 0; i < 25; i++) {
-            Vector3 jointPos = jointPositions[i];
-
-            Transform jointObj = bodyObj.transform.FindChild(i.ToString());
-            jointObj.localPosition = jointPos;
-
-            LineRenderer lr = jointObj.GetComponent<LineRenderer>();
-            lr.SetPosition(0, jointObj.localPosition);
-            lr.SetPosition(1, jointPos);
-            lr.SetColors(Color.green, Color.red);
+        Transform avatar = bodyObject.transform.FindChild("Avatar");
+        if (avatar.localScale.x != 1)
+        {
+            return;
         }
+
+        //Scale avatar based on torso distance
+        Transform hips = avatar.FindChild("Hips");
+        Transform spineBase = bodyObject.transform.FindChild("SpineBase");
+        Transform spineShoulder = bodyObject.transform.FindChild("SpineShoulder");
+        float bodyScale = Vector3.Magnitude(spineShoulder.position - spineBase.position);
+        Transform neck = avatar.FindChild("Hips/Spine/Spine1/Spine2/Neck/Neck1/Head");
+        float avatarScale = Vector3.Magnitude(neck.position - hips.position);
+        float scaleFactor = bodyScale / avatarScale;
+        avatar.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+
+    }
+
+    private void RefreshBodyObject(GameObject bodyObject)
+    {
+        Transform avatar = bodyObject.transform.FindChild("Avatar");
+
+        for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
+        {
+            if (_BoneMap.ContainsKey(jt))
+            {
+
+                if (_RigMap.ContainsKey(jt.ToString()))
+                {
+                    Transform avatarItem = avatar.FindChild(_RigMap[jt.ToString()]);
+                    Transform bodyItem = bodyObject.transform.FindChild(jt.ToString());
+
+                    if (jt.ToString() == "SpineBase")
+                    {
+                        avatarItem.position = bodyItem.position;
+                    }
+                    avatarItem.rotation = bodyItem.rotation * _RigMapOffsets[jt.ToString()];
+                }
+            }
+        }
+    }
+
+    private static Vector3 GetVector3FromJoint(Kinect.Joint joint)
+    {
+        return new Vector3(joint.Position.X * 3, joint.Position.Y * 3, joint.Position.Z * 3);
+    }
+
+    private static Quaternion GetQuaternionFromJointOrientation(Kinect.JointOrientation jointOrientation)
+    {
+        return new Quaternion(jointOrientation.Orientation.X, jointOrientation.Orientation.Y, jointOrientation.Orientation.Z, jointOrientation.Orientation.W);
     }
 }

@@ -28,7 +28,7 @@ public class BodyDataSender : Singleton<BodyDataSender> {
             return;
         }
 
-        Dictionary<ulong, Vector3[]> bodyData = _BodyDataConverter.GetData();
+        Dictionary<ulong, Transform[]> bodyData = _BodyDataConverter.GetData();
         if (bodyData == null) {
             return;
         }

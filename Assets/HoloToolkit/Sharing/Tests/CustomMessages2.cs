@@ -127,7 +127,7 @@ public class CustomMessages2 : Singleton<CustomMessages2>
         }
     */
 
-    public void SendBodyData(ulong trackingID, Vector3[] bodyData)
+    public void SendBodyData(ulong trackingID, Transform[] bodyData)
     {
         // If we are connected to a session, broadcast our info
 
@@ -138,9 +138,9 @@ public class CustomMessages2 : Singleton<CustomMessages2>
 
             msg.Write((long)trackingID);
 
-            foreach (Vector3 jointPos in bodyData)
+            foreach (Transform jointPos in bodyData)
             {
-                AppendVector3(msg, jointPos);
+                AppendTransform(msg, jointPos);
             }
             // Send the message as a broadcast
             this.serverConnection.Broadcast(
@@ -177,10 +177,10 @@ public class CustomMessages2 : Singleton<CustomMessages2>
 
     #region HelperFunctionsForWriting
 
-    void AppendTransform(NetworkOutMessage msg, Vector3 position, Quaternion rotation)
+    void AppendTransform(NetworkOutMessage msg, Transform transform)
     {
-        AppendVector3(msg, position);
-        AppendQuaternion(msg, rotation);
+        AppendVector3(msg, transform.position);
+        AppendQuaternion(msg, transform.rotation);
     }
 
     void AppendVector3(NetworkOutMessage msg, Vector3 vector)
