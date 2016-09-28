@@ -14,9 +14,9 @@ using UnityEngine;
 public class BodyDataReceiver : Singleton<BodyDataReceiver>
 {
 
-    private Dictionary<ulong, Transform[]> _Bodies = new Dictionary<ulong, Transform[]>();
+    private Dictionary<ulong, GameObject[]> _Bodies = new Dictionary<ulong, GameObject[]>();
 
-    public Dictionary<ulong, Transform[]> GetData()
+    public Dictionary<ulong, GameObject[]> GetData()
     {
         return _Bodies;
     }
@@ -33,14 +33,14 @@ public class BodyDataReceiver : Singleton<BodyDataReceiver>
         // Parse the message
         Debug.Log("Got vectors message");
         ulong trackingID = (ulong)msg.ReadInt64();
-        Transform jointTrans = new GameObject().transform;
-        Transform[] jointTransforms = new Transform[25];
+        GameObject joint = new GameObject();
+        GameObject[] jointTransforms = new GameObject[25];
 
         for (int i = 0; i < 25; i++)
         {
-            jointTrans.position = CustomMessages2.Instance.ReadVector3(msg);
-            jointTrans.rotation = CustomMessages2.Instance.ReadQuaternion(msg);
-            jointTransforms[i] = jointTrans;
+            joint.transform.position = CustomMessages2.Instance.ReadVector3(msg);
+            joint.transform.rotation = CustomMessages2.Instance.ReadQuaternion(msg);
+            jointTransforms[i] = joint;
         }
 
         _Bodies[trackingID] = jointTransforms;

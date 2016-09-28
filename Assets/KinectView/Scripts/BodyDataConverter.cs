@@ -16,23 +16,25 @@ public class BodyDataConverter : MonoBehaviour {
     public GameObject KinectBodyData;
     
     // Dictionary that maps body trackingIDs to an array of joint locations
-    private Dictionary<ulong, Transform[]> _Bodies =
-        new Dictionary<ulong, Transform[]>();
-    private KinectBodyData _BodyManager;
+    private Dictionary<ulong, GameObject[]> _Bodies =
+        new Dictionary<ulong, GameObject[]>();
+    private BodySourceManager _BodyManager;
 
     // Public function so other scripts can send out the data
-    public Dictionary<ulong, Transform[]> GetData() {
+    public Dictionary<ulong, GameObject[]> GetData() {
         return _Bodies;
     }
     
     void Update() {
 
         if (KinectBodyData == null) {
+            Debug.Log("No Kinect Body Data");
             return;
         }
         
-        _BodyManager = KinectBodyData.GetComponent<KinectBodyData>();
+        _BodyManager = KinectBodyData.GetComponent<BodySourceManager>();
         if (_BodyManager == null) {
+            Debug.Log("No Body source Manager");
             return;
         }
         
@@ -72,7 +74,6 @@ public class BodyDataConverter : MonoBehaviour {
             }
             
             if (body.IsTracked) {
-
                 if (!_Bodies.ContainsKey(body.TrackingId)) {
                     _Bodies[body.TrackingId] = CreateBodyData();
                 }
@@ -82,18 +83,27 @@ public class BodyDataConverter : MonoBehaviour {
         }
     }
     
-    private Transform[] CreateBodyData() {
-        Transform[] body = new Transform[25];
+    private GameObject[] CreateBodyData() {
+        GameObject[] body = new GameObject[25];
+        for (int i = 0; i < 25; i++) {
+            body[i] = new GameObject();
+            body[i].transform.position = Vector3.zero;
+            body[i].transform.rotation = Quaternion.identity;
+            body[i].transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        }
         return body;
     }
     
-    private void UpdateBodyData(Kinect.Body body, Transform[] bodyData) {
+    private void UpdateBodyData(Kinect.Body body, GameObject[] bodyData) {
 
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++) {
             Kinect.Joint sourceJoint = body.Joints[jt];
             Kinect.JointOrientation sourceJointOrientation = body.JointOrientations[jt];
-            bodyData[(int)jt].position = GetVector3FromJoint(sourceJoint);
-            bodyData[(int)jt].rotation = GetQuaternionFromJointOrientation(sourceJointOrientation);
+            //Debug.Log("Source joint:" + sourceJoint);
+            //Debug.Log("Vector:" + GetVector3FromJoint(sourceJoint));
+            //Debug.Log("BodyData[(int)jt]:" + bodyData[(int)jt]);
+            bodyData[(int)jt].transform.position = GetVector3FromJoint(sourceJoint);
+            bodyData[(int)jt].transform.rotation = GetQuaternionFromJointOrientation(sourceJointOrientation);
         }
     }
 

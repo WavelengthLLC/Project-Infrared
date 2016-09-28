@@ -273,7 +273,6 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 1453094771}
-  - 114: {fileID: 1453094768}
   - 114: {fileID: 1453094767}
   - 114: {fileID: 1453094770}
   - 114: {fileID: 1453094769}
@@ -295,19 +294,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd8a5c7aeae216b4580d3050698e4fca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BodyDataConverter: {fileID: 1453094766}
---- !u!114 &1453094768
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1453094766}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00b69834f76369a47844a1f12f607478, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  KinectBodyData: {fileID: 1453094766}
+  AvatarSourceView: {fileID: 576739137}
 --- !u!114 &1453094769
 MonoBehaviour:
   m_ObjectHideFlags: 0

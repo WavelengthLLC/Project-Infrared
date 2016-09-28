@@ -11,6 +11,11 @@ public class AvatarSourceView : MonoBehaviour
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
     private BodySourceManager _BodyManager;
 
+    // Public function so other scripts can send out the data
+    public Dictionary<ulong, GameObject> GetData()
+    {
+        return _Bodies;
+    }
 
     private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
     {

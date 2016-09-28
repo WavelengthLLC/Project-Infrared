@@ -121,7 +121,7 @@ public class BodyView : MonoBehaviour
             return;
         }
 
-        Dictionary<ulong, Transform[]> bodies;
+        Dictionary<ulong, GameObject[]> bodies;
 
         _BodyDataConverter = BodySourceManager.GetComponent<BodyDataConverter>();
         if (_BodyDataConverter == null)

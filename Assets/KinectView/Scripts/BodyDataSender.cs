@@ -12,31 +12,36 @@ using UnityEngine;
 
 public class BodyDataSender : Singleton<BodyDataSender> {
 
-    public GameObject BodyDataConverter;
+    public GameObject AvatarSourceView;
 
-    private BodyDataConverter _BodyDataConverter;
+    private AvatarSourceView _AvatarSourceView;
 
     void Update() {
 
-        // Get the parsed Kinect body data
-        if (BodyDataConverter == null) {
+
+        if (AvatarSourceView == null) {
+            Debug.Log("BodyDataConverter is null");
             return;
         }
 
-        _BodyDataConverter = BodyDataConverter.GetComponent<BodyDataConverter>();
-        if (_BodyDataConverter == null) {
+
+        _AvatarSourceView = AvatarSourceView.GetComponent<AvatarSourceView>();
+        if (_AvatarSourceView == null) {
+            Debug.Log("AvatarSourceView component missing");
             return;
         }
 
-        Dictionary<ulong, Transform[]> bodyData = _BodyDataConverter.GetData();
+        Dictionary<ulong, GameObject> bodyData = _AvatarSourceView.GetData();
         if (bodyData == null) {
+            Debug.Log("bodyData is null");
             return;
         }
 
+        //Debug.Log(bodyData);
         // Send over the bodyData one tracked body at a time
         List<ulong> trackingIDs = new List<ulong>(bodyData.Keys);
+        //Debug.Log(trackingIDs.Count);
         foreach (ulong trackingID in trackingIDs) {
-            Debug.Log("tracking ID:" + trackingID);
             CustomMessages2.Instance.SendBodyData(trackingID, bodyData[trackingID]);
         }
     }

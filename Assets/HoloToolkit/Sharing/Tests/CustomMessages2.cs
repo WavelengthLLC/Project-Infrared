@@ -5,6 +5,7 @@ using HoloToolkit.Sharing;
 using HoloToolkit.Unity;
 using System.Collections.Generic;
 using UnityEngine;
+using Kinect = Windows.Kinect;
 
 public class CustomMessages2 : Singleton<CustomMessages2>
 {
@@ -127,20 +128,21 @@ public class CustomMessages2 : Singleton<CustomMessages2>
         }
     */
 
-    public void SendBodyData(ulong trackingID, Transform[] bodyData)
+    public void SendBodyData(ulong trackingID, GameObject bodyData)
     {
         // If we are connected to a session, broadcast our info
+        //Debug.Log("SendBodyData");
 
         if (this.serverConnection != null && this.serverConnection.IsConnected())
         {
-            // Create an outgoing network message to contain all the info we want to send
             NetworkOutMessage msg = CreateMessage((byte)TestMessageID.BodyData);
 
             msg.Write((long)trackingID);
 
-            foreach (Transform jointPos in bodyData)
+            for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
             {
-                AppendTransform(msg, jointPos);
+                Transform bodyItem = bodyData.transform.FindChild(jt.ToString());
+                AppendTransform(msg, bodyItem);
             }
             // Send the message as a broadcast
             this.serverConnection.Broadcast(
