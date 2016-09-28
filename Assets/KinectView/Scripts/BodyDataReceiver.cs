@@ -9,16 +9,23 @@ using HoloToolkit.Sharing;
 using HoloToolkit.Unity;
 using System.Collections.Generic;
 using UnityEngine;
+using Kinect = Windows.Kinect;
 
 // Receives the body data messages
 public class BodyDataReceiver : Singleton<BodyDataReceiver>
 {
 
-    private Dictionary<ulong, GameObject[]> _Bodies = new Dictionary<ulong, GameObject[]>();
+    private Dictionary<ulong, Vector3[]> _BodiesPos = new Dictionary<ulong, Vector3[]>();
+    private Dictionary<ulong, Quaternion[]> _BodiesRot = new Dictionary<ulong, Quaternion[]>();
 
-    public Dictionary<ulong, GameObject[]> GetData()
+    public Dictionary<ulong, Vector3[]> GetPosData()
     {
-        return _Bodies;
+        return _BodiesPos;
+    }
+
+    public Dictionary<ulong, Quaternion[]> GetRotData()
+    {
+        return _BodiesRot;
     }
 
     void Start()
@@ -31,18 +38,20 @@ public class BodyDataReceiver : Singleton<BodyDataReceiver>
     void UpdateBodyData(NetworkInMessage msg)
     {
         // Parse the message
-        Debug.Log("Got vectors message");
+        Debug.Log("Getting messages");
         ulong trackingID = (ulong)msg.ReadInt64();
-        GameObject joint = new GameObject();
-        GameObject[] jointTransforms = new GameObject[25];
+
+        //GameObject joint = new GameObject();
+        Vector3[] jointPos = new Vector3[25];
+        Quaternion[] jointRot = new Quaternion[25];
 
         for (int i = 0; i < 25; i++)
         {
-            joint.transform.position = CustomMessages2.Instance.ReadVector3(msg);
-            joint.transform.rotation = CustomMessages2.Instance.ReadQuaternion(msg);
-            jointTransforms[i] = joint;
+            jointPos[i] = CustomMessages2.Instance.ReadVector3(msg);
+            jointRot[i] = CustomMessages2.Instance.ReadQuaternion(msg);
         }
 
-        _Bodies[trackingID] = jointTransforms;
+        _BodiesPos[trackingID] = jointPos;
+        _BodiesRot[trackingID] = jointRot;
     }
 }

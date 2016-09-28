@@ -3,12 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using Kinect = Windows.Kinect;
 
+using HoloToolkit.Sharing;
+using HoloToolkit.Unity;
+
 public class BodyView : MonoBehaviour
 {
     public Material BoneMaterial;
     public GameObject BodySourceManager;
 
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
+
     private BodyDataConverter _BodyDataConverter;
     private BodyDataReceiver _BodyDataReceiver;
 
@@ -121,7 +125,8 @@ public class BodyView : MonoBehaviour
             return;
         }
 
-        Dictionary<ulong, GameObject[]> bodies;
+        Dictionary<ulong, Vector3[]> bodies_pos = null;
+        Dictionary<ulong, Quaternion[]> bodies_rot = null;
 
         _BodyDataConverter = BodySourceManager.GetComponent<BodyDataConverter>();
         if (_BodyDataConverter == null)
@@ -133,20 +138,21 @@ public class BodyView : MonoBehaviour
             }
             else
             {
-                bodies = _BodyDataReceiver.GetData();
+                bodies_pos = _BodyDataReceiver.GetPosData();
+                bodies_rot = _BodyDataReceiver.GetRotData();
             }
         }
         else
         {
-            bodies = _BodyDataConverter.GetData();
+            //bodies = _BodyDataConverter.GetData();
         }
 
-        if (bodies == null)
+        if (bodies_pos == null || bodies_rot == null)
         {
             return;
         }
 
-        List<ulong> trackedIDs = new List<ulong>(bodies.Keys);
+        List<ulong> trackedIDs = new List<ulong>(bodies_pos.Keys);
         List<ulong> knownIDs = new List<ulong>(_Bodies.Keys);
         foreach (ulong trackingID in knownIDs)
         {
@@ -158,7 +164,7 @@ public class BodyView : MonoBehaviour
             }
         }
 
-        foreach (ulong trackingID in bodies.Keys)
+        foreach (ulong trackingID in bodies_pos.Keys)
         {
 
             if (!_Bodies.ContainsKey(trackingID))
@@ -166,29 +172,17 @@ public class BodyView : MonoBehaviour
                 _Bodies[trackingID] = CreateBodyObject(trackingID);
             }
 
-            RefreshBodyObject( _Bodies[trackingID]);
+            RefreshBodyObject(trackingID, bodies_pos, bodies_rot);
         }
     }
 
     private GameObject CreateBodyObject(ulong id)
     {
-
+        Debug.Log("Created Avatar Object");
         GameObject body = new GameObject("Body:" + id);
-
-        for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
-        {
-            GameObject jointObj = new GameObject();
-            //GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-
-            jointObj.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
-            jointObj.name = jt.ToString();
-            jointObj.transform.parent = body.transform;
-        }
-        // Add avatar gameobject from source
         GameObject avatar = Instantiate(Resources.Load("Jill", typeof(GameObject))) as GameObject;
         avatar.transform.parent = body.transform;
         avatar.name = "Avatar";
-        //avatar.transform.parent = body.transform.Find("SpineBase");
         return body;
     }
 
@@ -213,15 +207,18 @@ public class BodyView : MonoBehaviour
 
     }
 
-    private void RefreshBodyObject(GameObject bodyObject)
+    private void RefreshBodyObject(ulong id, Dictionary<ulong, Vector3[]> bodies_pos, Dictionary<ulong, Quaternion[]> bodies_rot)
     {
+
+        Debug.Log("Updating Avatar Object");
+        GameObject bodyObject = _Bodies[id];
+
         Transform avatar = bodyObject.transform.FindChild("Avatar");
 
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
             if (_BoneMap.ContainsKey(jt))
             {
-
                 if (_RigMap.ContainsKey(jt.ToString()))
                 {
                     Transform avatarItem = avatar.FindChild(_RigMap[jt.ToString()]);
@@ -229,9 +226,9 @@ public class BodyView : MonoBehaviour
 
                     if (jt.ToString() == "SpineBase")
                     {
-                        avatarItem.position = bodyItem.position;
+                        avatarItem.position = bodies_pos[id][(int)jt];
                     }
-                    avatarItem.rotation = bodyItem.rotation * _RigMapOffsets[jt.ToString()];
+                    avatarItem.rotation = bodies_rot[id][(int)jt] * _RigMapOffsets[jt.ToString()];
                 }
             }
         }

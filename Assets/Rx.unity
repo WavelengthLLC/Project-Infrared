@@ -114,11 +114,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 576739137}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83df1f110526b2d459af5fe099131898, type: 3}
+  m_Script: {fileID: 11500000, guid: d13c2fa9880bba843920681cca0a6474, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   BoneMaterial: {fileID: 2100000, guid: f2ea145c63353784985576f08398a815, type: 2}
-  BodySourceManager: {fileID: 0}
+  BodySourceManager: {fileID: 1694865363}
 --- !u!4 &576739139
 Transform:
   m_ObjectHideFlags: 0
