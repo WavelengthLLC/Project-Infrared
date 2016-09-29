@@ -19,7 +19,6 @@ ExportedObj/
 *.pidb
 *.booproj
 *.svd
-*.dll
 *.CSharp
 *.CSharp.*
 *.CSharp.Editor
