@@ -235,13 +235,9 @@ public class AvatarSourceView : MonoBehaviour
         {
             Kinect.Joint sourceJoint = body.Joints[jt];
             Kinect.JointOrientation sourceJointOrientation = body.JointOrientations[jt];
-            Kinect.Joint? targetJoint = null;
-            Kinect.JointOrientation? targetJointOrientation = null;
             
             if(_BoneMap.ContainsKey(jt))
             {
-                targetJoint = body.Joints[_BoneMap[jt]];
-                targetJointOrientation = body.JointOrientations[_BoneMap[jt]];
 
                 if (_RigMap.ContainsKey(jt.ToString())) {
                     Transform avatarItem = avatar.FindChild(_RigMap[jt.ToString()]);

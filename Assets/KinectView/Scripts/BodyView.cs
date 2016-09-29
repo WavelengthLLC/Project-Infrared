@@ -226,7 +226,6 @@ public class BodyView : MonoBehaviour
                 if (_RigMap.ContainsKey(jt.ToString()))
                 {
                     Transform avatarItem = avatar.FindChild(_RigMap[jt.ToString()]);
-                    Transform bodyItem = bodyObject.transform.FindChild(jt.ToString());
 
                     if (jt.ToString() == "SpineBase")
                     {
