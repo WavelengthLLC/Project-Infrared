@@ -10,6 +10,7 @@ public class AvatarSourceView : MonoBehaviour
 
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
     private BodySourceManager _BodyManager;
+    public string avatarAssetName;
 
     // Public function so other scripts can send out the data
     public Dictionary<ulong, GameObject> GetData()
@@ -200,7 +201,7 @@ public class AvatarSourceView : MonoBehaviour
 
         }
         // Add avatar gameobject from source
-        GameObject avatar = Instantiate(Resources.Load("Jill", typeof(GameObject))) as GameObject;
+        GameObject avatar = Instantiate(Resources.Load(avatarAssetName, typeof(GameObject))) as GameObject;
         avatar.transform.parent = body.transform;
         avatar.name = "Avatar";
         //avatar.transform.parent = body.transform.Find("SpineBase");

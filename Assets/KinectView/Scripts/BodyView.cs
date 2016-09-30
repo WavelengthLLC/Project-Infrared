@@ -10,6 +10,7 @@ public class BodyView : MonoBehaviour
 {
     public Material BoneMaterial;
     public GameObject BodySourceManager;
+    public string avatarAssetName;
 
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
 
@@ -184,7 +185,7 @@ public class BodyView : MonoBehaviour
     {
         Debug.Log("Created Avatar Object");
         GameObject body = new GameObject("Body:" + id);
-        GameObject avatar = Instantiate(Resources.Load("Jill", typeof(GameObject))) as GameObject;
+        GameObject avatar = Instantiate(Resources.Load(avatarAssetName, typeof(GameObject))) as GameObject;
         avatar.transform.parent = body.transform;
         avatar.name = "Avatar";
         return body;
