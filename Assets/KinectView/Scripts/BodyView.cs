@@ -11,6 +11,7 @@ public class BodyView : MonoBehaviour
     public Material BoneMaterial;
     public GameObject BodySourceManager;
     public string avatarAssetName;
+    public float scaleFactor;
 
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
 
@@ -236,15 +237,5 @@ public class BodyView : MonoBehaviour
                 }
             }
         }
-    }
-
-    private static Vector3 GetVector3FromJoint(Kinect.Joint joint)
-    {
-        return new Vector3(joint.Position.X * 3, joint.Position.Y * 3, joint.Position.Z * 3);
-    }
-
-    private static Quaternion GetQuaternionFromJointOrientation(Kinect.JointOrientation jointOrientation)
-    {
-        return new Quaternion(jointOrientation.Orientation.X, jointOrientation.Orientation.Y, jointOrientation.Orientation.Z, jointOrientation.Orientation.W);
     }
 }

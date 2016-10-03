@@ -11,6 +11,7 @@ public class AvatarSourceView : MonoBehaviour
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
     private BodySourceManager _BodyManager;
     public string avatarAssetName;
+    public float scaleFactor;
 
     // Public function so other scripts can send out the data
     public Dictionary<ulong, GameObject> GetData()
@@ -253,7 +254,7 @@ public class AvatarSourceView : MonoBehaviour
             }
             
             Transform jointObj = bodyObject.transform.FindChild(jt.ToString());
-            jointObj.localPosition = GetVector3FromJoint(sourceJoint);
+            jointObj.localPosition = GetVector3FromJoint(sourceJoint, scaleFactor);
             jointObj.localRotation = GetQuaternionFromJointOrientation(sourceJointOrientation);
             
         }
@@ -274,9 +275,9 @@ public class AvatarSourceView : MonoBehaviour
         }
     }
     
-    private static Vector3 GetVector3FromJoint(Kinect.Joint joint)
+    private static Vector3 GetVector3FromJoint(Kinect.Joint joint, float scaleFactor)
     {
-        return new Vector3(joint.Position.X * 3, joint.Position.Y * 3 , joint.Position.Z * 3);
+        return new Vector3(joint.Position.X * scaleFactor, joint.Position.Y * scaleFactor, joint.Position.Z * scaleFactor);
     }
 
     private static Quaternion GetQuaternionFromJointOrientation(Kinect.JointOrientation jointOrientation)
