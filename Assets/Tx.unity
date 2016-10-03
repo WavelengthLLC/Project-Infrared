@@ -120,7 +120,7 @@ MonoBehaviour:
   BoneMaterial: {fileID: 2100000, guid: f2ea145c63353784985576f08398a815, type: 2}
   BodySourceManager: {fileID: 1453094766}
   avatarAssetName: Mortimer
-  scaleFactor: 1
+  scaleFactor: 30
 --- !u!4 &576739139
 Transform:
   m_ObjectHideFlags: 0
