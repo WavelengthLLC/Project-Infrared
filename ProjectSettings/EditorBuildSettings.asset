@@ -9,5 +9,7 @@ EditorBuildSettings:
     path: Assets/testReceive.unity
   - enabled: 0
     path: Assets/Tx.unity
-  - enabled: 1
+  - enabled: 0
     path: Assets/Rx.unity
+  - enabled: 1
+    path: Assets/KR200.unity
